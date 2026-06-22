@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Bank Exam Quiz</title>
+
+<style>
+
+body{
+    font-family: Arial, sans-serif;
+    background:#f4f6f9;
+    margin:0;
+    padding:20px;
+}
+
+.container{
+    max-width:1000px;
+    margin:auto;
+}
+
+h1{
+    text-align:center;
+}
+
+/* ========================= */
+/* TIMER AREA */
+/* ========================= */
+
+#timer-container{
+    position:sticky;
+    top:0;
+    z-index:100;
+    background:#f4f6f9;
+    padding-bottom:10px;
+}
+
+#timer{
+    background:#222;
+    color:white;
+    padding:15px;
+    text-align:center;
+    font-size:22px;
+    border-radius:10px;
+    margin-bottom:10px;
+}
+
+.timer-buttons{
+    text-align:center;
+}
+
+#pauseBtn,
+#resumeBtn{
+    padding:10px 20px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:16px;
+    margin:5px;
+}
+
+#pauseBtn{
+    background:#ff9800;
+    color:white;
+}
+
+#resumeBtn{
+    background:#28a745;
+    color:white;
+}
+
+.question{
+    background:white;
+    padding:20px;
+    margin-bottom:20px;
+    border-radius:12px;
+    box-shadow:0 2px 8px rgba(0,0,0,0.1);
+}
+
+.question h3{
+    margin-bottom:15px;
+}
+
+.option{
+    display:block;
+    padding:12px;
+    margin:10px 0;
+    border:1px solid #ccc;
+    border-radius:8px;
+    cursor:pointer;
+    transition:0.2s;
+}
+
+.option:hover{
+    background:#f0f0f0;
+}
+
+.selected{
+    background:#cfe2ff;
+    border:2px solid #0d6efd;
+}
+
+.mark-btn{
+    margin-top:10px;
+    padding:8px 15px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    background:#ff9800;
+    color:white;
+}
+
+.marked{
+    background:#ffcc80 !important;
+}
+
+.review-marked{
+    background:#e0e0e0 !important;
+    border:2px solid #9e9e9e;
+}
+
+.clear-btn{
+    margin-top:10px;
+    margin-left:10px;
+    padding:8px 15px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    background:#dc3545;
+    color:white;
+}
+
+.submit-btn{
+    width:100%;
+    padding:15px;
+    font-size:20px;
+    border:none;
+    border-radius:10px;
+    background:#28a745;
+    color:white;
+    cursor:pointer;
+    margin-top:20px;
+}
+
+.result-box{
+    background:white;
+    padding:30px;
+    border-radius:12px;
+    text-align:center;
+    box-shadow:0 2px 10px rgba(0,0,0,0.1);
+}
+
+.review-btn{
+    padding:12px 20px;
+    margin-top:20px;
+    border:none;
+    border-radius:10px;
+    background:#007bff;
+    color:white;
+    font-size:18px;
+    cursor:pointer;
+}
+
+.review-question{
+    background:white;
+    padding:20px;
+    margin:20px 0;
+    border-radius:12px;
+    box-shadow:0 2px 8px rgba(0,0,0,0.1);
+}
+
+.correct{
+    color:green;
+    font-weight:bold;
+}
+
+.wrong{
+    color:red;
+    font-weight:bold;
+}
+
+.unanswered{
+    color:orange;
+    font-weight:bold;
+}
+
+.correct-answer{
+    background:#d4edda;
+    padding:10px;
+    border-radius:8px;
+    margin-top:10px;
+}
+
+.disabled-option{
+    pointer-events:none;
+    opacity:0.6;
+}
+
+.disabled-btn{
+    opacity:0.6;
+    cursor:not-allowed;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Bank Exam MCQ Quiz</h1>
+
+<!-- ========================= -->
+<!-- TIMER -->
+<!-- ========================= -->
+
+<div id="timer-container">
+
+    <div id="timer">
+        Time Left: 20:00
+    </div>
+
+    <div class="timer-buttons">
+
+        <button id="pauseBtn" onclick="pauseTimer()">
+            Pause
+        </button>
+
+        <button id="resumeBtn" onclick="resumeTimer()" disabled>
+            Resume
+        </button>
+
+    </div>
+
+</div>
+
+<div id="quiz"></div>
+
+<button class="submit-btn" onclick="submitQuiz()">
+Submit Quiz
+</button>
+
+</div>
+
+<script>
+
+// ===============================
+// QUESTIONS AREA
+// ===============================
+
+const questions = [
+
+{q:"The Department for Promotion of Industry and Internal Trade (DPIIT) recently released a revised Wholesale Price Index (WPI) series with base year 2022–23 replacing 2011–12 to better capture changes in the economy. Which of the following correctly states the new base year adopted for WPI?", options:["2020–21","2021–22","2022–23","2023–24"], answer:2},
+
+{q:"Under the revised Wholesale Price Index (WPI) series released by the Department for Promotion of Industry and Internal Trade (DPIIT), the total number of items in the WPI basket has been increased from 697 to:", options:["857 items","897 items","957 items","1,007 items"], answer:2},
+
+{q:"Along with the revised Wholesale Price Index (WPI), DPIIT introduced Output Producer Price Index (OPPI), Trial Input Producer Price Index (IPPI) and which additional category of indices?", options:["Retail Producer Price Index","Export Producer Price Index","Service Producer Price Indices","Consumption Price Indices"], answer:2},
+
+{q:"According to the revised WPI data released by DPIIT, the Wholesale Price Index (WPI) inflation for May 2026 stood at:", options:["8.74%","9.12%","9.68%","10.03%"], answer:2},
+
+{q:"Fuel and Power inflation under the revised Wholesale Price Index (WPI) series for May 2026 was recorded at:", options:["24.75%","27.84%","30.33%","32.90%"], answer:2},
+
+{q:"The Ministry of Road Transport and Highways (MoRTH) partnered with Rapido to promote awareness about the Rahveer Scheme aimed at encouraging bystanders to assist road accident victims during the Golden Hour. Which Union Minister announced this partnership?", options:["Ashwini Vaishnaw","Nitin Gadkari","Kiren Rijiju","Hardeep Singh Puri"], answer:1},
+
+{q:"Which co-founder of Rapido participated in the partnership with the Ministry of Road Transport and Highways (MoRTH) for promoting awareness of the Rahveer Scheme?", options:["Pavan Guntupalli","Aravind Sanka","Rishikesh SR","Mohan Kumar"], answer:1},
+
+{q:"The primary objective of the Rahveer Scheme promoted jointly by MoRTH and Rapido is to:", options:["Encourage safe driving among youth","Promote electric mobility","Encourage citizens to help road accident victims during the Golden Hour","Provide insurance coverage to delivery personnel"], answer:2},
+
+{q:"More than how many Rapido users and captains reportedly took the Rahveer Pledge, creating a Guinness World Record?", options:["Two lakh","Three lakh","Four lakh","Five lakh"], answer:2},
+
+{q:"Under the Rahveer Scheme, citizens who help road accident victims are entitled to receive:", options:["₹10,000 and a medal","₹15,000 and a citation","₹25,000 and a certificate","₹50,000 and a commendation letter"], answer:2},
+
+{q:"The Rahveer Scheme was launched in:", options:["January 2025","April 2025","July 2025","October 2025"], answer:1},
+
+{q:"Rapido, which partnered with MoRTH for awareness of the Rahveer Scheme, is headquartered in:", options:["Hyderabad","Pune","Bengaluru","Chennai"], answer:2},
+
+{q:"Rapido was founded in which year?", options:["2013","2014","2015","2016"], answer:2},
+
+{q:"The Agricultural and Processed Food Products Export Development Authority (APEDA) facilitated the first export consignment of GI-tagged Tezpur Litchi to which international destination?", options:["Singapore","Abu Dhabi","Doha","Dubai"], answer:3},
+
+{q:"The export of GI-tagged Tezpur Litchi was undertaken under APEDA, which functions under:", options:["Ministry of Agriculture and Farmers Welfare","Ministry of Food Processing Industries","Ministry of Commerce and Industry","Ministry of Consumer Affairs, Food and Public Distribution"], answer:2},
+
+{q:"Which of the following is one of the prominent varieties of Tezpur Litchi mentioned in the export initiative?", options:["Dashehari","Sahi","Alphonso","Langra"], answer:1},
+
+{q:"APEDA was established under the APEDA Act, 1985 and came into existence in:", options:["1984","1985","1986","1987"], answer:2},
+
+{q:"The headquarters of Agricultural and Processed Food Products Export Development Authority (APEDA) is located in:", options:["Mumbai","New Delhi","Noida","Gurugram"], answer:1},
+
+{q:"India recently joined Anthropic’s expanded Project Glasswing and received access to which AI model?", options:["Claude Opus","Claude Sonnet","Claude Mythos Preview","Claude Nova"], answer:2},
+
+{q:"The primary purpose of India's participation in Project Glasswing is to strengthen:", options:["Climate modelling capabilities","Quantum computing research","Cybersecurity and software vulnerability assessment","Semiconductor fabrication"], answer:2},
+
+{q:"Approximately how many organisations are now participating in Anthropic’s Project Glasswing?", options:["100","125","150","200"], answer:2},
+
+{q:"Which among the following organisations is one of the participants in Project Glasswing?", options:["IMF","UNESCO","SWIFT","CERN"], answer:2},
+
+{q:"Anthropic, which runs Project Glasswing, was founded in:", options:["2019","2020","2021","2022"], answer:2},
+
+{q:"Anthropic is headquartered in:", options:["Seattle, USA","San Francisco, USA","Austin, USA","Boston, USA"], answer:1},
+
+{q:"The Ministry of Education granted Letters of Approval (LoAs) to three foreign universities under UGC regulations. Which university is scheduled to commence operations in Bengaluru from August 2026?", options:["University of Bristol","University of York","University of New South Wales (UNSW)","Queen’s University Belfast"], answer:2},
+
+{q:"Which two universities have been granted approval to establish campuses in Mumbai?", options:["UNSW and Deakin University","University of Bristol and University of York","University of Wollongong and UNSW","University of Bristol and Queen's University Belfast"], answer:1},
+
+{q:"The total number of Letters of Approval (LoAs) issued under the UGC Regulations for Foreign Higher Educational Institutions increased to:", options:["Three","Four","Five","Seven"], answer:2},
+
+{q:"The University Grants Commission (UGC) was established in:", options:["1952","1954","1956","1958"], answer:2},
+
+{q:"Varanasi became the first city integrated under India’s Easy Connect hub-and-spoke aviation model, which is being operated by:", options:["IndiGo","Air India","Akasa Air","SpiceJet"], answer:1},
+
+{q:"Under the Easy Connect aviation model, Varanasi will be connected to how many international destinations?", options:["12","15","17","20"], answer:2},
+
+{q:"Flights under the Easy Connect aviation model are scheduled to commence from:", options:["1 June 2026","15 June 2026","25 June 2026","1 July 2026"], answer:2},
+
+{q:"Air India, which operates the Easy Connect model, was founded in:", options:["1928","1930","1932","1940"], answer:2},
+
+{q:"A 20 kW Akashvani FM transmitter was inaugurated at Ramgarh in Jaisalmer district of Rajasthan by:", options:["Nitin Gadkari","Dharmendra Pradhan","Ashwini Vaishnaw","Jyotiraditya Scindia"], answer:2},
+
+{q:"The newly inaugurated Akashvani FM transmitter at Ramgarh provides coverage over approximately:", options:["10,000 sq km","15,000 sq km","20,000 sq km","25,000 sq km"], answer:2},
+
+{q:"With the inauguration of the Ramgarh transmitter, the total number of FM transmitters in Rajasthan increased to:", options:["35","37","39","41"], answer:2},
+
+{q:"Prasar Bharati, under which Akashvani operates, was established in:", options:["1995","1997","1999","2000"], answer:1},
+
+{q:"IIT Madras released the world's most detailed 3D atlas of the human brainstem named:", options:["NEURON","BRAINMAP","ANCHOR","SYNAPSE"], answer:2},
+
+{q:"The ANCHOR project was released by the Sudha Gopalakrishnan Brain Centre (SGBC) of IIT Madras during the:", options:["BRICS AI Summit","3rd BRICS Neuroscience Symposium","Global Brain Congress","International Neuroinformatics Conference"], answer:1},
+
+{q:"The ANCHOR atlas reconstructed more than how many brainstem nuclei and fibre tracts?", options:["100","150","200","250"], answer:2},
+
+{q:"The Ministry of Rural Development announced the establishment of 700 SHE-MARTs and 1,000 district fulfilment centres under Deendayal Antyodaya Yojana–National Rural Livelihoods Mission (DAY-NRLM) with the broader objective of supporting the creation of:", options:["Three crore Lakhpati Didis","Four crore Lakhpati Didis","Five crore Lakhpati Didis","Six crore Lakhpati Didis"], answer:3},
+
+{q:"India Post recently launched a drone-based mail transmission service between Mandi Head Post Office and Rehardhar Branch Post Office in Himachal Pradesh to improve connectivity in remote areas. Which Union Minister announced this initiative?", options:["Ashwini Vaishnaw","Jyotiraditya Scindia","Kiren Rijiju","Jitendra Singh"], answer:1},
+
+{q:"The newly launched drone-based postal service of India Post operates on which route in Himachal Pradesh?", options:["Shimla Head Post Office – Chopal Branch Post Office","Mandi Head Post Office – Rehardhar Branch Post Office","Dharamshala Head Post Office – Palampur Branch Post Office","Solan Head Post Office – Kandaghat Branch Post Office"], answer:1},
+
+{q:"With the introduction of drone-based mail transmission by the Department of Posts, the transit time on the Mandi–Rehardhar route has been reduced to approximately:", options:["Five minutes","Seven minutes","Ten minutes","Fifteen minutes"], answer:1},
+
+{q:"Expansion of India Post’s drone-based mail transmission service is planned across nearly how many routes in Himachal Pradesh and Assam?", options:["100 routes","120 routes","150 routes","200 routes"], answer:2},
+
+{q:"India Post functions under which ministry of the Government of India?", options:["Ministry of Electronics and Information Technology","Ministry of Home Affairs","Ministry of Communications","Ministry of Commerce and Industry"], answer:2},
+
+{q:"The motto of India Post is:", options:["Service Before Self","Dak Seva Jan Seva","Connectivity for All","Delivering Trust Always"], answer:1},
+
+{q:"The National Cadet Corps (NCC) recently approved independent State Directorates for which two states to improve coordination and training activities?", options:["Odisha and Chhattisgarh","Telangana and Bihar","Andhra Pradesh and Jharkhand","Assam and Tripura"], answer:2},
+
+{q:"Following the approval of new directorates, the total number of State Directorates under the National Cadet Corps (NCC) increased to:", options:["17","18","19","20"], answer:2},
+
+{q:"The National Cadet Corps (NCC) currently has a strength of more than:", options:["15 lakh cadets","18 lakh cadets","20 lakh cadets","25 lakh cadets"], answer:2},
+
+{q:"The presence of the National Cadet Corps (NCC) extends across more than how many districts in India?", options:["600 districts","650 districts","700 districts","750 districts"], answer:3},
+
+{q:"The motto of the National Cadet Corps (NCC) is:", options:["Service and Sacrifice","Nation First Always First","Unity and Discipline","Duty and Honour"], answer:2},
+
+{q:"The National Cadet Corps (NCC) was established in:", options:["1947","1948","1950","1952"], answer:1},
+
+{q:"Tunnel Hood Technology is being introduced in which major railway infrastructure project in India?", options:["Delhi–Varanasi High-Speed Rail Corridor","Mumbai–Ahmedabad Bullet Train Project","Chennai–Bengaluru Semi High-Speed Corridor","Delhi–Amritsar Bullet Train Project"], answer:1},
+
+{q:"The primary purpose of installing tunnel hoods in the Mumbai–Ahmedabad Bullet Train Project is to:", options:["Increase train speed above 400 kmph","Reduce vibration on tracks","Minimise tunnel boom and noise caused by high-speed trains","Strengthen mountain tunnel foundations"], answer:2},
+
+{q:"Tunnel Hood Technology marks the first use of such a system in:", options:["Metro Rail projects in India","Indian Railways","Dedicated Freight Corridors","Regional Rapid Transit Systems"], answer:1},
+
+{q:"The Mumbai–Ahmedabad Bullet Train corridor includes how many mountain tunnels?", options:["Six","Seven","Eight","Nine"], answer:2},
+
+{q:"National High Speed Rail Corporation Limited (NHSRCL), responsible for the Bullet Train Project, was established in:", options:["2014","2015","2016","2017"], answer:2},
+
+{q:"Indian Railways recently approved a ₹201-crore project for installation of Kavach on the remaining Broad Gauge routes of which division?", options:["Delhi Division","Ambala Division","Jaipur Division","Lucknow Division"], answer:1},
+
+{q:"The ₹201-crore Kavach project will cover approximately how many route kilometres across Haryana, Punjab and Himachal Pradesh?", options:["598 route km","711 route km","811 route km","911 route km"], answer:2},
+
+{q:"Kavach, developed as an indigenous Automatic Train Protection (ATP) system, has been developed by:", options:["IRCTC","RailTel","Research Designs and Standards Organisation (RDSO)","Konkan Railway Corporation Limited"], answer:2},
+
+{q:"The Kavach system automatically applies brakes and prevents:", options:["Wheel Slippage During Rainfall","Signal Passing at Danger (SPAD)","Track Misalignment","Overloading of Freight Wagons"], answer:1},
+
+{q:"The communication backbone used by Kavach is based on:", options:["Satellite communication","5G network","Optical fibre communication","LTE-based communication"], answer:3},
+
+{q:"Research Designs and Standards Organisation (RDSO), which developed Kavach, is headquartered at:", options:["New Delhi","Chennai","Hyderabad","Lucknow"], answer:3},
+
+{q:"The Memorandum of Agreement for implementing the “Standard Framework for Paving and Greening of Urban Roads” in NCR areas of Uttar Pradesh was signed under which organisation?", options:["Central Pollution Control Board (CPCB)","National Green Tribunal (NGT)","Commission for Air Quality Management (CAQM)","National Highways Authority of India (NHAI)"], answer:2},
+
+{q:"CSIR-Central Road Research Institute (CRRI) signed the MoA jointly with Uttar Pradesh PWD and which institution?", options:["IIT Delhi","School of Planning and Architecture (SPA), New Delhi","National Institute of Urban Affairs","TERI School of Advanced Studies"], answer:1},
+
+{q:"The Commission for Air Quality Management (CAQM) was established in:", options:["2019","2020","2021","2022"], answer:2},
+
+{q:"The Ministry of Tribal Affairs recently launched the premium brand “RISA – Timeless Tribal” under which organisation?", options:["National Scheduled Tribes Finance and Development Corporation","Tribal Cooperative Marketing Development Federation of India (TRIFED)","Khadi and Village Industries Commission","Handicrafts and Handloom Export Corporation"], answer:1},
+
+{q:"The RISA Store was inaugurated at:", options:["Pragati Maidan, New Delhi","Rajiv Gandhi Handicrafts Bhawan, Connaught Place, New Delhi","Dilli Haat, INA","Bharat Mandapam, New Delhi"], answer:1},
+
+{q:"Premium packaging for the RISA – Timeless Tribal brand is being developed by:", options:["National Institute of Fashion Technology (NIFT), Delhi","Indian Institute of Packaging, Mumbai","National Institute of Design (NID), Haryana","Indian Institute of Handloom Technology, Varanasi"], answer:2},
+
+{q:"Which of the following tribal textile traditions selected in Phase-I under the RISA – Timeless Tribal initiative belongs to Tamil Nadu?", options:["Changpa Pashmina","Dongria Embroidery","Toda Embroidery","Santal Cotton"], answer:2},
+
+{q:"Union Minister Shivraj Singh Chouhan unveiled the Viksit Bharat – Guarantee for Rozgar and Ajeevika Mission (Gramin) [VB-G RAM G], which will become effective from:", options:["1 June 2026","15 June 2026","1 July 2026","15 July 2026"], answer:2},
+
+{q:"The total outlay of the Viksit Bharat – Guarantee for Rozgar and Ajeevika Mission (Gramin) [VB-G RAM G] exceeds:", options:["₹95,000 crore","₹1 lakh crore","₹1.15 lakh crore","₹1.25 lakh crore"], answer:3},
+
+{q:"Under the VB-G RAM G framework, how much allocation has been earmarked under MGNREGA, 2005?", options:["₹20,000 crore","₹25,000 crore","₹30,000 crore","₹35,000 crore"], answer:2},
+
+{q:"The VB-G RAM G framework is expected to benefit nearly how many Gram Panchayats?", options:["2 lakh","2.5 lakh","2.8 lakh","3 lakh"], answer:2},
+
+{q:"Among the states mentioned, which received the highest allocation under the VB-G RAM G framework?", options:["Andhra Pradesh","West Bengal","Tamil Nadu","Uttar Pradesh"], answer:3},
+
+{q:"The Indian Council of Agricultural Research (ICAR) launched the AI-powered WhatsApp advisory platform named:", options:["Krishi AI Mitra","Oilseeds Kisaan Mitra","Agri Sakha AI","Smart Kisan Sewa"], answer:1},
+
+{q:"Oilseeds Kisaan Mitra has been developed under which institute?", options:["ICAR–Indian Agricultural Research Institute (IARI), New Delhi","ICAR–National Soybean Research Institute, Indore","ICAR–Indian Institute of Oilseeds Research (IIOR), Hyderabad","ICAR–Indian Institute of Pulses Research, Kanpur"], answer:2},
+
+{q:"Oilseeds Kisaan Mitra provides advisory support on crops such as groundnut, soybean, mustard, sesame and sunflower through:", options:["A dedicated Android application","SMS services only","WhatsApp-based AI platform","IVRS call centres"], answer:2},
+
+{q:"The overall coordination of Oilseeds Kisaan Mitra is being undertaken by:", options:["Dr Chunduri Sarada","Dr Ravi Kumar Mathur","Cheedella Nimesh","Katipally Sriman"], answer:1},
+
+{q:"The Department of Agricultural Research and Education (DARE), under which the Director General of ICAR functions, was established in:", options:["1969","1971","1973","1975"], answer:2},
+
+{q:"The Department for Promotion of Industry and Internal Trade (DPIIT) recently released a revised Wholesale Price Index (WPI) series with base year 2022–23 replacing 2011–12 to better capture changes in the economy. Which of the following correctly states the new base year adopted for WPI?", options:["2020–21","2021–22","2022–23","2023–24"], answer:2},
+
+{q:"Under the revised Wholesale Price Index (WPI) series released by the Department for Promotion of Industry and Internal Trade (DPIIT), the total number of items in the WPI basket has been increased from 697 to:", options:["857 items","897 items","957 items","1,007 items"], answer:2},
+
+{q:"Along with the revised Wholesale Price Index (WPI), DPIIT introduced Output Producer Price Index (OPPI), Trial Input Producer Price Index (IPPI) and which additional category of indices?", options:["Retail Producer Price Index","Export Producer Price Index","Service Producer Price Indices","Consumption Price Indices"], answer:2},
+
+{q:"According to the revised WPI data released by DPIIT, the Wholesale Price Index (WPI) inflation for May 2026 stood at:", options:["8.74%","9.12%","9.68%","10.03%"], answer:2},
+
+{q:"Fuel and Power inflation under the revised Wholesale Price Index (WPI) series for May 2026 was recorded at:", options:["24.75%","27.84%","30.33%","32.90%"], answer:2},
+
+{q:"The Ministry of Finance announced several measures to improve ease of investment for Persons Resident Outside India (PROIs) and Foreign Portfolio Investors (FPIs) to deepen debt markets and increase foreign participation in Government Securities (G-Secs). Which route was expanded to include 15-year, 30-year and 40-year Government Securities?", options:["Liberalised Remittance Route (LRR)","Sovereign Debt Access Route (SDAR)","Fully Accessible Route (FAR)","External Portfolio Route (EPR)"], answer:2},
+
+{q:"Under the measures announced by the Ministry of Finance, individual Persons Resident Outside India (PROIs) are now permitted to invest in listed Indian companies through:", options:["Qualified Foreign Investor Scheme","Foreign Direct Investment Route","Portfolio Investment Scheme","Liberalised Overseas Investment Scheme"], answer:2},
+
+{q:"As per the revised norms, the investment limit for an individual Person Resident Outside India (PROI) in listed Indian companies has been increased from 5% to:", options:["7%","8%","10%","12%"], answer:2},
+
+{q:"The aggregate investment limit for Persons Resident Outside India (PROIs) in listed Indian companies has been enhanced from 10% to:", options:["20%","22%","24%","26%"], answer:2},
+
+{q:"The Ministry of Finance retained the overall investment cap for Foreign Portfolio Investors (FPIs) in Central Government Securities (G-Secs) at:", options:["4%","5%","6%","8%"], answer:2},
+
+{q:"Under the revised framework, the investment cap for Foreign Portfolio Investors (FPIs) in State Government Securities (SGSs) continues to remain at:", options:["1%","2%","3%","4%"], answer:1},
+
+{q:"Effective from 1 April 2026, interest income and capital gains arising from Government Securities (G-Secs) for Foreign Portfolio Investors (FPIs) and Foreign Institutional Investors (FIIs) will attract:", options:["5% tax","10% tax","15% tax","Nil tax"], answer:3},
+
+{q:"India recently announced the first tranche of financial assistance to the United Nations Relief and Works Agency for Palestine Refugees (UNRWA). What amount was announced as the first tranche?", options:["US$1 million","US$2.5 million","US$3 million","US$5 million"], answer:1},
+
+{q:"India’s contribution to UNRWA was announced by:", options:["Harsh Vardhan Shringla","T.S. Tirumurti","Harish Parvathaneni","P. Kumaran"], answer:2},
+
+{q:"The contribution announced by India to the United Nations Relief and Works Agency for Palestine Refugees (UNRWA) represents the first tranche of India’s annual commitment of:", options:["US$2.5 million","US$4 million","US$5 million","US$7.5 million"], answer:2},
+
+{q:"India increased its annual assistance to UNRWA from US$1.25 million to US$5 million beginning from:", options:["2016–17","2017–18","2018–19","2019–20"], answer:2},
+
+{q:"Which historic diplomatic visit by Prime Minister Narendra Modi led to increased engagement and support towards Palestine?", options:["Visit to Palestine in January 2017","Visit to Palestine in February 2018","Visit to Jordan in March 2018","Visit to Israel in February 2019"], answer:1},
+
+{q:"The United Nations Relief and Works Agency for Palestine Refugees (UNRWA) was established in:", options:["1945","1947","1949","1951"], answer:2},
+
+{q:"Prime Minister Narendra Modi became the longest-serving elected Prime Minister in India's history after surpassing the continuous tenure record previously held by:", options:["Lal Bahadur Shastri","Indira Gandhi","Atal Bihari Vajpayee","Jawaharlal Nehru"], answer:3},
+
+{q:"Prime Minister Narendra Modi surpassed Jawaharlal Nehru’s continuous tenure record on:", options:["26 May 2024","9 June 2026","10 June 2026","15 June 2026"], answer:2},
+];
+
+// ===============================
+// VARIABLES
+// ===============================
+
+let userAnswers = new Array(questions.length).fill(null);
+
+let markedForReview = new Array(questions.length).fill(false);
+
+let submitted = false;
+
+// ===============================
+// LOAD QUIZ
+// ===============================
+
+function loadQuiz(){
+
+    const quizDiv = document.getElementById("quiz");
+
+    questions.forEach((question,index)=>{
+
+        const qDiv = document.createElement("div");
+
+        qDiv.classList.add("question");
+
+        qDiv.id = `question_${index}`;
+
+        qDiv.innerHTML = `
+        <h3>Q${index+1}. ${question.q}</h3>
+        `;
+
+        question.options.forEach((option,optIndex)=>{
+
+            const opt = document.createElement("div");
+
+            opt.classList.add("option");
+
+            opt.innerText = option;
+
+            opt.onclick = ()=>selectOption(index,optIndex,opt);
+
+            opt.id = `q${index}_opt${optIndex}`;
+
+            qDiv.appendChild(opt);
+
+        });
+
+        // MARK BUTTON
+
+        const markBtn = document.createElement("button");
+
+        markBtn.innerText = "Mark For Review";
+
+        markBtn.classList.add("mark-btn");
+
+        markBtn.onclick = ()=>toggleMark(index,markBtn);
+
+        qDiv.appendChild(markBtn);
+
+        // CLEAR BUTTON
+
+        const clearBtn = document.createElement("button");
+
+        clearBtn.innerText = "Clear";
+
+        clearBtn.classList.add("clear-btn");
+
+        clearBtn.onclick = ()=>clearAnswer(index);
+
+        qDiv.appendChild(clearBtn);
+
+        quizDiv.appendChild(qDiv);
+
+    });
+
+}
+
+// ===============================
+// SELECT OPTION
+// ===============================
+
+function selectOption(qIndex,optIndex,element){
+
+    if(submitted) return;
+
+    userAnswers[qIndex] = optIndex;
+
+    const options = document.querySelectorAll(`[id^="q${qIndex}_opt"]`);
+
+    options.forEach(opt=>{
+        opt.classList.remove("selected");
+    });
+
+    element.classList.add("selected");
+
+}
+
+// ===============================
+// MARK FOR REVIEW
+// ===============================
+
+function toggleMark(index,button){
+
+    markedForReview[index] = !markedForReview[index];
+
+    const questionBox = document.getElementById(`question_${index}`);
+
+    if(markedForReview[index]){
+
+        button.classList.add("marked");
+
+        button.innerText = "Marked For Review";
+
+        questionBox.classList.add("review-marked");
+
+    }else{
+
+        button.classList.remove("marked");
+
+        button.innerText = "Mark For Review";
+
+        questionBox.classList.remove("review-marked");
+
+    }
+
+}
+
+// ===============================
+// CLEAR ANSWER
+// ===============================
+
+function clearAnswer(index){
+
+    if(submitted) return;
+
+    userAnswers[index] = null;
+
+    const options = document.querySelectorAll(`[id^="q${index}_opt"]`);
+
+    options.forEach(opt=>{
+        opt.classList.remove("selected");
+    });
+
+}
+
+// ===============================
+// SUBMIT QUIZ
+// ===============================
+
+function submitQuiz(){
+
+    if(submitted) return;
+
+    submitted = true;
+
+    clearInterval(timer);
+
+    let score = 0;
+
+    let correctCount = 0;
+    let wrongCount = 0;
+    let unansweredCount = 0;
+
+    questions.forEach((question,index)=>{
+
+        const userAns = userAnswers[index];
+
+        if(userAns === null){
+
+            unansweredCount++;
+
+        }
+        else if(userAns === question.answer){
+
+            score += 1;
+            correctCount++;
+
+        }
+        else{
+
+            score -= 0.25;
+            wrongCount++;
+
+        }
+
+    });
+
+    let attempted = correctCount + wrongCount;
+
+    let accuracy = attempted > 0
+    ? ((correctCount/attempted)*100).toFixed(2)
+    : 0;
+
+    document.body.innerHTML = `
+
+    <div class="container">
+
+        <div class="result-box">
+
+            <h1>Quiz Submitted ✅</h1>
+
+            <h2>Total Score: ${score.toFixed(2)}</h2>
+
+            <h3>Correct Answers: ${correctCount}</h3>
+
+            <h3>Wrong Answers: ${wrongCount}</h3>
+
+            <h3>Unanswered Questions: ${unansweredCount}</h3>
+
+            <h3>Accuracy: ${accuracy}%</h3>
+
+            <button class="review-btn" onclick="reviewAnswers()">
+            Review Answers
+            </button>
+
+            <div id="reviewSection"></div>
+
+        </div>
+
+    </div>
+
+    `;
+
+}
+
+// ===============================
+// REVIEW ANSWERS
+// ===============================
+
+function reviewAnswers(){
+
+    const reviewSection = document.getElementById("reviewSection");
+
+    let html = `<h1 style="margin-top:40px;">Review Section</h1>`;
+
+    questions.forEach((question,index)=>{
+
+        const userAns = userAnswers[index];
+
+        let status = "";
+        let marks = "";
+
+        if(userAns === null){
+
+            status = `<span class="unanswered">Unanswered</span>`;
+            marks = `0 Marks`;
+
+        }
+        else if(userAns === question.answer){
+
+            status = `<span class="correct">Correct ✅</span>`;
+            marks = `+1 Mark`;
+
+        }
+        else{
+
+            status = `<span class="wrong">Wrong ❌</span>`;
+            marks = `-0.25 Mark`;
+
+        }
+
+        html += `
+
+        <div class="review-question">
+
+            <h3>Q${index+1}. ${question.q}</h3>
+
+            <p>${status}</p>
+
+            <p><b>Marks:</b> ${marks}</p>
+
+            <p>
+            <b>Your Answer:</b>
+            ${
+                userAns === null
+                ? "Not Attempted"
+                : question.options[userAns]
+            }
+            </p>
+
+            <div class="correct-answer">
+            <b>Correct Answer:</b>
+            ${question.options[question.answer]}
+            </div>
+
+        </div>
+
+        `;
+
+    });
+
+    reviewSection.innerHTML = html;
+
+}
+
+// ===============================
+// TIMER
+// ===============================
+
+let time = 1800;
+
+let timer;
+
+let isPaused = false;
+
+function startTimer(){
+
+    timer = setInterval(()=>{
+
+        if(!isPaused){
+
+            let minutes = Math.floor(time/60);
+
+            let seconds = time%60;
+
+            document.getElementById("timer").innerText =
+            `Time Left: ${minutes}:${seconds < 10 ? '0'+seconds : seconds}`;
+
+            time--;
+
+            if(time < 0){
+
+                clearInterval(timer);
+
+                alert("Time is up! Quiz auto-submitted.");
+
+                submitQuiz();
+
+            }
+
+        }
+
+    },1000);
+
+}
+
+// ===============================
+// PAUSE TIMER
+// ===============================
+
+function pauseTimer(){
+
+    if(submitted) return;
+
+    isPaused = true;
+
+    document.getElementById("pauseBtn").disabled = true;
+
+    document.getElementById("resumeBtn").disabled = false;
+
+    // Disable options
+    document.querySelectorAll(".option").forEach(opt=>{
+        opt.classList.add("disabled-option");
+    });
+
+    // Disable buttons
+    document.querySelectorAll(".mark-btn, .clear-btn").forEach(btn=>{
+        btn.disabled = true;
+        btn.classList.add("disabled-btn");
+    });
+
+}
+// ===============================
+// RESUME TIMER
+// ===============================
+
+function resumeTimer(){
+
+    if(submitted) return;
+
+    isPaused = false;
+
+    document.getElementById("pauseBtn").disabled = false;
+
+    document.getElementById("resumeBtn").disabled = true;
+
+    // Enable options
+    document.querySelectorAll(".option").forEach(opt=>{
+        opt.classList.remove("disabled-option");
+    });
+
+    // Enable buttons
+    document.querySelectorAll(".mark-btn, .clear-btn").forEach(btn=>{
+        btn.disabled = false;
+        btn.classList.remove("disabled-btn");
+    });
+
+}
+// ===============================
+
+loadQuiz();
+
+startTimer();
+
+</script>
+
+</body>
+</html>
